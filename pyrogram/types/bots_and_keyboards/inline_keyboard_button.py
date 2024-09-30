@@ -36,6 +36,9 @@ class InlineKeyboardButton(Object):
         callback_data (``str`` | ``bytes``, *optional*):
             Data to be sent in a callback query to the bot when button is pressed, 1-64 bytes.
 
+        copy_text (``str``, *optional*):
+            Text to be copied to clipboard when button is pressed.
+
         url (``str``, *optional*):
             HTTP url to be opened when button is pressed.
 
@@ -82,6 +85,7 @@ class InlineKeyboardButton(Object):
         self,
         text: str,
         callback_data: Optional[Union[str, bytes]] = None,
+        copy_text: Optional[str] = None,
         url: Optional[str] = None,
         web_app: Optional["types.WebAppInfo"] = None,
         login_url: Optional["types.LoginUrl"] = None,
@@ -96,6 +100,7 @@ class InlineKeyboardButton(Object):
 
         self.text = str(text)
         self.callback_data = callback_data
+        self.copy_text = copy_text
         self.url = url
         self.web_app = web_app
         self.login_url = login_url
@@ -120,6 +125,12 @@ class InlineKeyboardButton(Object):
                 text=b.text,
                 callback_data=data,
                 requires_password=getattr(b, "requires_password", None)
+            )
+
+        if isinstance(b, raw.types.KeyboardButtonCopy):
+            return InlineKeyboardButton(
+                text=b.text,
+                copy_text=b.copy_text
             )
 
         if isinstance(b, raw.types.KeyboardButtonUrl):
@@ -181,6 +192,12 @@ class InlineKeyboardButton(Object):
                 text=self.text,
                 data=data,
                 requires_password=self.requires_password
+            )
+
+        if self.copy_text is not None:
+            return raw.types.KeyboardButtonCopy(
+                text=self.text,
+                copy_text=self.copy_text
             )
 
         if self.url is not None:
